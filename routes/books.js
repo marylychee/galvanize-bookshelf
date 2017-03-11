@@ -1,18 +1,19 @@
 'use strict';
 
 const express = require('express');
-
-// eslint-disable-next-line new-cap
 const router = express.Router();
-
 var knex = require('../db/knex');
 
-// YOUR CODE HERE
-router.get('/books', (req, res, next) => {
+const {
+   camelizeKeys,
+   decamelizeKeys
+} = require('humps');
+
+router.get('/books', (_req, res, next) => {
   knex('books')
-    .orderBy('id')
+  .orderBy('title')
     .then((books) => {
-      res.send(books);
+      res.send(camelizeKeys(books));
     })
     .catch((err) => {
       next(err);
@@ -28,7 +29,7 @@ router.get('/books/:id', (req, res, next) => {
         return next();
       }
 
-      res.send(book);
+      res.send(camelizeKeys(book));
     })
     .catch((err) => {
       next(err);
@@ -42,9 +43,10 @@ router.post('/books', (req, res, next) => {
       author: req.body.author,
       genre: req.body.genre,
       description: req.body.description,
+      cover_url: req.body.coverUrl,
     }, '*')
     .then((books) => {
-      res.send(books[0]);
+      res.send(camelizeKeys(books[0]));
     })
     .catch((err) => {
       next(err);
@@ -66,11 +68,12 @@ router.patch('/books/:id', (req, res, next) => {
           author: req.body.author,
           genre: req.body.genre,
           description: req.body.description,
+          cover_url: req.body.coverUrl,
         }, '*')
         .where('id', req.params.id);
     })
     .then((books) => {
-      res.send(books[0]);
+      res.send(camelizeKeys(books[0]));
     })
     .catch((err) => {
       next(err);
@@ -88,7 +91,7 @@ router.delete('/books/:id', (req, res, next) => {
         return next();
       }
 
-      artist = row;
+      book = row;
 
       return knex('books')
         .del()
@@ -96,14 +99,12 @@ router.delete('/books/:id', (req, res, next) => {
     })
     .then(() => {
       delete book.id;
-      res.send(book);
-    });
+      res.send(camelizeKeys(book));
+    })
     .catch((err) => {
       next(err);
     });
 });
-
-
 
 
 module.exports = router;
