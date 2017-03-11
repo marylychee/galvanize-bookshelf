@@ -1,10 +1,19 @@
 'use strict';
 
 const express = require('express');
-
-// eslint-disable-next-line new-cap
 const router = express.Router();
+var knex = require('../db/knex');
 
-// YOUR CODE HERE
+const {
+   camelizeKeys,
+   decamelizeKeys
+} = require('humps');
+
+router.post('/users', (req, res, next) => {
+  knex('users')
+    .then((users) => {
+        res.send(users);
+    })
+});
 
 module.exports = router;
