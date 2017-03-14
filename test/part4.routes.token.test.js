@@ -108,16 +108,16 @@ suite('part4 routes token', () => {
       .expect(400, 'Bad email or password', done);
   });
 
-  // test('POST /token with bad password', (done) => {
-  //   request(server)
-  //     .post('/token')
-  //     .set('Accept', 'application/json')
-  //     .set('Content-Type', 'application/json')
-  //     .send({
-  //       email: 'jkrowling@gmail.com',
-  //       password: 'badpassword'
-  //     })
-  //     .expect('Content-Type', /plain/)
-  //     .expect(400, 'Bad email or password', done);
-  // });
+  test('POST /token with bad password', (done) => {
+    request(server)
+      .post('/token')
+      .set('Accept', 'application/json')
+      .set('Content-Type', 'application/json')
+      .send({
+        email: 'jkrowling@gmail.com',
+        password: 'badpassword'
+      })
+      .expect('Content-Type', /plain/)
+      .expect(400, 'Bad email or password', done);
+  });
 });

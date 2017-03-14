@@ -19,7 +19,7 @@ router.get('/token', (req, res, next) => {
         if (err) {
             //unauthorized
             res.set('Content-type', 'application/json');
-            res.status(200).send(false);
+            res.status(200).send('false');
         } else {
             res.set('Content-type', 'application/json');
             res.status(200).send('true');
@@ -28,41 +28,48 @@ router.get('/token', (req, res, next) => {
 })
 
 router.post('/token', (req, res, next) => {
+    const { email, password } = req.body;
+    let user;
     knex('users')
-        .where('email', req.body.email)
-        .then((res_row) => {
-            bcrypt.compare(req.body.password, res_row[0].hashed_password)
-              .then(function(res) {
-                // res can be true or false
-                return res;
-              })
-              .then(function(true_res) {
-                // res is true and our passwords are matched
-                const claim = {
-                    userId: res_row[0].id
-                };
-                const token = jwt.sign(claim, process.env.JWT_KEY, {
-                    expiresIn: '7 days'
-                });
+        .where('email', email)
+        .then((users) => {
+            user = users[0];
+            return bcrypt.compare(req.body.password, user.hashed_password)
+        })
+        .then(() => {
+            // res is true and our passwords are matched
+            const claim = {
+                userId: user.id
+            };
 
-                res.cookie('token', token, {
-                    path: '/',
-                    httpOnly: true,
-                    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), // 7 days)
-                    secure: router.get('env') === 'production' // Set from the NODE_ENV
-                });
+            const token = jwt.sign(claim, process.env.JWT_KEY, {
+                expiresIn: '7 days'
+            });
 
-                delete res_row[0].hashed_password;
+            res.cookie('token', token, {
+                path: '/',
+                httpOnly: true,
+                expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+                secure: router.get('env') === 'production'
+            });
 
-                res.send(camelizeKeys(res_row[0]));
+            delete user.hashed_password;
 
-              })
-        });
+            return res.send(camelizeKeys(user));
+        })
+        .catch((err) => {
+            res.set('Content-Type', 'text/plain')
+            return res.status(400).send('Bad email or password');
+            return next()
+        })
 });
 
 router.delete('/token', (req, res, next) => {
-  res.clearCookie('token', { path: '/token' });
-  res.send(true);
+    res.clearCookie('token', {
+        path: '/token'
+    })
+    res.set('Content-type', 'application/json');
+    res.status(200).send('true');
 })
 
 module.exports = router;
