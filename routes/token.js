@@ -55,7 +55,7 @@ router.post('/token', (req, res, next) => {
 
             delete user.hashed_password;
 
-            return res.send(camelizeKeys(user));
+            return res.status(200).send(camelizeKeys(user));
         })
         .catch((err) => {
             res.set('Content-Type', 'text/plain')

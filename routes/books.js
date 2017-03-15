@@ -13,7 +13,7 @@ router.get('/books', (_req, res, next) => {
   knex('books')
   .orderBy('title')
     .then((books) => {
-      res.send(camelizeKeys(books));
+      res.status(200).send(camelizeKeys(books));
     })
     .catch((err) => {
       next(err);
@@ -29,7 +29,7 @@ router.get('/books/:id', (req, res, next) => {
         return next();
       }
 
-      res.send(camelizeKeys(book));
+      res.status(200).send(camelizeKeys(book));
     })
     .catch((err) => {
       next(err);
@@ -46,7 +46,7 @@ router.post('/books', (req, res, next) => {
       cover_url: req.body.coverUrl,
     }, '*')
     .then((books) => {
-      res.send(camelizeKeys(books[0]));
+      res.status(200).send(camelizeKeys(books[0]));
     })
     .catch((err) => {
       next(err);
@@ -73,7 +73,7 @@ router.patch('/books/:id', (req, res, next) => {
         .where('id', req.params.id);
     })
     .then((books) => {
-      res.send(camelizeKeys(books[0]));
+      res.status(200).send(camelizeKeys(books[0]));
     })
     .catch((err) => {
       next(err);
@@ -99,7 +99,7 @@ router.delete('/books/:id', (req, res, next) => {
     })
     .then(() => {
       delete book.id;
-      res.send(camelizeKeys(book));
+      res.status(200).send(camelizeKeys(book));
     })
     .catch((err) => {
       next(err);
