@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 var knex = require('../db/knex');
 const jwt = require('jsonwebtoken');
+const cert = process.env.JWT_KEY;
 
 const {
    camelizeKeys,
@@ -13,15 +14,15 @@ const {
 let tokenID;
 
 function authorizeUser(req, res, next) {
-  jwt.verify(req.cookies.token, process.env.JWT_KEY, (err, payload) => {
+  jwt.verify(req.cookies.token, cert, (err, payload) => {
    if (err) {
      // Unauthorized
      res.set('Content-type', 'text/plain');
      res.status(401).send('Unauthorized');
    }
    else {
-     // Authorized
-     tokenID = payload.userId;
+     // Authorized - decription of the claim i.e. user.id
+     req.token = payload.userId;
      next();
    }
   })
@@ -30,7 +31,7 @@ function authorizeUser(req, res, next) {
 router.get('/favorites', authorizeUser, (req, res, next) => {
     knex('favorites')
       .innerJoin('books', 'books.id', 'favorites.book_id')
-      .where('favorites.user_id', tokenID)
+      .where('favorites.user_id', req.token)
       .orderBy('books.title', 'ASC')
       .then((favorites_row) => {
         let favs = camelizeKeys(favorites_row);
@@ -68,7 +69,7 @@ router.post('/favorites', authorizeUser, (req, res, next) => {
       knex('favorites')
         .insert({
           'book_id' : bookId,
-          'user_id' : tokenID
+          'user_id' : req.token
         })
         .returning('*')
         .then((books) => {

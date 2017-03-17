@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt-as-promised');
 const knex = require('../db/knex');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const cert = process.env.JWT_KEY;
 
 const {
     camelizeKeys,
@@ -15,7 +16,7 @@ const {
 
 
 router.get('/token', (req, res, next) => {
-    jwt.verify(req.cookies.token, process.env.JWT_KEY, (err, payload) => {
+    jwt.verify(req.cookies.token, cert, (err, payload) => {
         if (err) {
             //unauthorized
             res.set('Content-type', 'application/json');
@@ -42,7 +43,7 @@ router.post('/token', (req, res, next) => {
                 userId: user.id
             };
 
-            const token = jwt.sign(claim, process.env.JWT_KEY, {
+            const token = jwt.sign(claim, cert, {
                 expiresIn: '7 days'
             });
 
