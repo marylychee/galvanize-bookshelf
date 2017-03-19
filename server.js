@@ -55,7 +55,6 @@ app.use((_req, res) => {
   res.sendStatus(404);
 });
 
-// eslint-disable-next-line max-params
 app.use((err, _req, res, _next) => {
   if (err.output && err.output.statusCode) {
     return res
@@ -64,7 +63,10 @@ app.use((err, _req, res, _next) => {
       .send(err.message);
   }
 
-  // eslint-disable-next-line no-console
+  if (err.status) {
+    return res.status(err.status).send(err);
+  }
+
   console.error(err.stack);
   res.sendStatus(500);
 });
@@ -73,7 +75,6 @@ const port = process.env.PORT || 8000;
 
 app.listen(port, () => {
   if (app.get('env') !== 'test') {
-    // eslint-disable-next-line no-console
     console.log('Listening on port', port);
   }
 });

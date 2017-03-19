@@ -4,14 +4,24 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt-as-promised');
 const knex = require('../knex');
-
+const ev = require('express-validation');
+const validations = require('../validations/users')
 
 const {
    camelizeKeys,
    decamelizeKeys
 } = require('humps');
 
-router.post('/users', (req, res, next) => {
+router.post('/users', ev(validations.post), (req, res, next) => {
+
+  // Run error checking
+
+  // Validations passed -- Submit into databse and
+  // redirect
+
+  // Validation failed -- Re-render as data is
+  // invalid
+
   bcrypt.hash(req.body.password, 12)
     .then((hashed_password) => {
       return knex('users')
