@@ -4,13 +4,20 @@ const Joi = require('joi');
 
 module.exports.post = {
   body: {
-    email: Joi.string();
+    firstName: Joi.string()
+      .label('First Name')
+      .required()
+      .trim(),
+    lastName: Joi.string()
+      .label('Last Name')
+      .required()
+      .trim(),
+    email: Joi.string()
       .label('Email')
       .required()
       .email()
       .trim(),
-
-    password: Joi.string();
+    hashed_password: Joi.string()
       .label('Password')
       .requried()
       .trim()

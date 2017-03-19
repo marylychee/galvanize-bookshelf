@@ -3,11 +3,12 @@
 const express = require('express');
 const router = express.Router();
 var knex = require('../db/knex');
-
 const {
    camelizeKeys,
    decamelizeKeys
 } = require('humps');
+const ev = require('express-validation');
+const validations = require('../validations/users');
 
 router.get('/books', (_req, res, next) => {
   knex('books')
@@ -36,7 +37,7 @@ router.get('/books/:id', (req, res, next) => {
     });
 });
 
-router.post('/books', (req, res, next) => {
+router.post('/books', ev(validations.post), (req, res, next) => {
   knex('books')
     .insert({
       title: req.body.title,

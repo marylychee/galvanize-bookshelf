@@ -7,6 +7,8 @@ const knex = require('../db/knex');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const cert = process.env.JWT_KEY;
+const ev = require('express-validation');
+const validations = require('../validations/users');
 
 const {
     camelizeKeys,
@@ -28,7 +30,7 @@ router.get('/token', (req, res, next) => {
     });
 })
 
-router.post('/token', (req, res, next) => {
+router.post('/token', ev(validations.post), (req, res, next) => {
     const { email, password } = req.body;
     let user;
     knex('users')

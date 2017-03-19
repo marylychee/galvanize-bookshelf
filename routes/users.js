@@ -14,14 +14,6 @@ const {
 
 router.post('/users', ev(validations.post), (req, res, next) => {
 
-  // Run error checking
-
-  // Validations passed -- Submit into databse and
-  // redirect
-
-  // Validation failed -- Re-render as data is
-  // invalid
-
   bcrypt.hash(req.body.password, 12)
     .then((hashed_password) => {
       return knex('users')

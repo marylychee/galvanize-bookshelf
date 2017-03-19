@@ -5,11 +5,9 @@ const router = express.Router();
 var knex = require('../db/knex');
 const jwt = require('jsonwebtoken');
 const cert = process.env.JWT_KEY;
-
-const {
-   camelizeKeys,
-   decamelizeKeys
-} = require('humps');
+const { camelizeKeys,decamelizeKeys} = require('humps');
+const ev = require('express-validation');
+const validations = require('../validations/users');
 
 let tokenID;
 
@@ -64,12 +62,12 @@ router.get('/favorites/check', authorizeUser, (req, res, next) => {
       })
 })
 
-router.post('/favorites', authorizeUser, (req, res, next) => {
+router.post('/favorites', authorizeUser, ev(validations.post), (req, res, next) => {
       let bookId = req.body.bookId;
       knex('favorites')
         .insert({
-          'book_id' : bookId,
-          'user_id' : req.token
+          book_id : bookId,
+          user_id : req.token
         })
         .returning('*')
         .then((books) => {
